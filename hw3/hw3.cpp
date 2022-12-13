@@ -1,0 +1,106 @@
+// NAME: Minh Nguyen
+// DATE: 02/09/2022
+// FILE: hw3.cpp
+// DESCRIPTION: Tests IntFunc class
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+using namespace std;
+#include "intFunc.h"
+
+void readFile(string filename);
+
+int main()
+{
+  readFile("test1.csv");
+  readFile("test2.csv");
+  
+  
+  // You should test with additional test files, 
+  // but comment them out before return.
+  
+  return 0;
+}
+
+
+void readFile(string filename){
+  
+  // read the test file and initialize an IntFunc object
+  ifstream file;
+  string word, line;
+  int tempNum, count = 0, tempCount = 0, size = 100;
+  int* temp1;
+  int* temp2;
+  
+  file.open(filename);
+  
+  if(!file){
+    cout << "file problem... exiting program..." << endl;
+    return;
+  }
+
+  while(getline(file,line)){
+    stringstream s(line);
+    while(getline(s, word, ',')){
+      if(tempCount == 0){
+        tempNum = stoi(word);
+        temp1 = new int[size];
+        temp1[count] = tempNum;
+        count++;
+        tempCount++;
+      }else{
+        tempNum = stoi(word);
+        temp1[count] = tempNum;
+        count++;
+      }
+    }
+  }
+  file.close();
+
+  temp2 = new int[count];
+  for (int i = 0; i < count; i++)
+    temp2[i] = temp1[i];
+
+  delete [] temp1;
+
+  //testing from
+  cout << endl << "TESTING FROM " << filename << endl;
+  
+  //constructor
+  int tempx = temp2[0];
+  int tempy = temp2[1];
+  IntFunc func(tempx, tempy);
+  
+  //add pair
+  for (int i = 1; i < count/2 + 1; i++){
+    tempx = temp2[2*i];
+    tempy = temp2[2*i+1];
+    func.addPair(tempx, tempy);
+  }
+
+  //printfx
+  func.printFx();
+
+  //printRange()
+  func.printRange();
+
+  //onto
+  if(func.onto())
+    cout << "f(x) is onto." << endl;
+  else
+    cout << "f(x) is not onto." << endl;
+  
+  //oneToOne
+  if(func.oneToOne())
+    cout << "f(x) is one-to-one." << endl;
+  else
+    cout << "f(x) is not one-to-one" << endl;
+  
+  //inverse
+  func.inverse();
+  
+  delete [] temp2;
+  // test all functions. Ex. f.printFx();
+  
+}

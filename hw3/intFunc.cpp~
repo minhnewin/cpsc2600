@@ -1,0 +1,146 @@
+// NAME: 
+// DATE: MM/DD/YYYY
+// FILE: intFunc.cpp
+// DESCRIPTION: Implementation of the IntFunc class.
+
+#include <iostream>
+using namespace std;
+#include "intFunc.h"
+
+IntFunc::IntFunc(int x, int y)
+{
+  //initialize all the data members
+  maxX = x;
+  maxY = y;
+  size = -1;
+  count = 0;
+  inputs = new int[maxX];
+  outputs = new int[maxY];
+  range = new int[maxY];
+  sortInput = new int[maxX];
+
+}
+
+//add all the other functions
+
+IntFunc::~IntFunc()
+{
+  delete [] inputs;
+  delete [] outputs;
+}
+
+
+// Adds (x,y) to the function.
+// Prints a warning if the input already exists.
+void IntFunc::addPair(int x, int y)
+{ 
+  size++;
+  for(int i = 0; i < size; i++){
+    if(x == inputs[i]){
+      cout << endl << "WARNING! this domain already exists!" << endl;
+      size--;
+      return;
+    }
+  }
+  if(y < 0 || y > maxY){
+    cout << endl << "WARNING! this co-domain is outside of maxY!" << endl;
+    return;
+  }
+  // countData is a counter for the amount of data in the csv file
+  inputs[size] = x;
+  outputs[size] = y;
+}
+
+// Displays the function to the screen.
+void IntFunc::printFx() const
+{
+  for(int i = 0; i < size; i++){
+    for(int j = i + 1; j < size; j++){
+      if(inputs[i] > inputs[j]){
+        int temp = inputs[i];
+        inputs[i] = inputs[j];
+        inputs[j] = temp;
+
+        int temp2 = outputs[i];
+        outputs[i] = outputs[j];
+        outputs[j] = temp2;
+      }
+    }
+  }
+  
+  for (int i = 0; i < size; i++){
+    cout << "f(" << inputs[i] << ") = " << outputs[i] << endl;
+  }
+}
+
+// Displays the range of the function.
+void IntFunc::printRange() const
+{
+  for(int i = 0; i < size; i++)
+    sortInput[i] = inputs[i];
+  
+  for(int i = 0; i < size; i++)
+    range[i] = outputs[i];
+  
+  for(int i = 0; i < size; i++){
+    for(int j = i + 1; j < size; j++){
+      if(range[i] > range[j]){
+        int temp = range[i];
+        range[i] = range[j];
+        range[j] = temp;
+
+        int temp2 = sortInput[i];
+        sortInput[i] = sortInput[j];
+        sortInput[j] = temp2;
+      }
+    }
+  }
+  
+  cout << "range = {";
+  for (int i = 0; i < size; i++){
+    cout << range[i];
+    if (size - 1 == i)
+      cout << "}" << endl;
+    else
+      cout << ", ";
+  }  
+}
+
+// [Write the description]
+bool IntFunc::onto() const
+{
+  for(int i = 0; i < size; i++){
+    if(range[i] != i)
+      return false;
+  }
+  return true;
+}
+
+// [Write the description]
+bool IntFunc::oneToOne() const
+{
+  int test;
+  for(int i = 0; i < size; i++){
+    test = outputs[i];
+    for (int j = i + 1; j < size; j++){
+      if(test == outputs[j]){
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+// [Write the description]
+IntFunc IntFunc::inverse() const
+{
+  if (onto() && oneToOne()){
+    cout << endl << "The inverse function: " << endl;
+    for(int i = 0; i < size; i++){
+      cout << "f(" << range[i] << ") = " << sortInput[i] << endl;
+    }
+  }
+  else
+    cout << "This function is not a bijection. f(0) = 0" << endl;
+  return IntFunc(maxX, maxY);
+}

@@ -1,0 +1,172 @@
+private static Random rand = new Random();private static Random rand = new Random();//Name: Minh Nguyen
+//Date: Friday March 4, 2022
+//schedule.cpp
+
+#include <iostream>
+using namespace std;
+#include "schedule.h"
+
+//implement copy constructor
+Schedule::Schedule(const Schedule& s)
+{
+  size = s.size;
+  courses = new int*[size];
+  for(int i = 0; i < size; i++) {
+    courses[i] = new int[size];
+  }
+  for(int i = 0; i < size; i++){
+    for(int j = 0; j < size; j++){
+      courses[i][j] = s.courses[i][j];
+    }
+  }
+  colors = new int[size];
+  for(int i = 0; i < size; i++){
+    colors[i] = s.colors[i];
+  }
+  maxColor = s.maxColor;
+}
+
+Schedule::Schedule(int n)
+{
+  size = n;
+  
+  courses = new int*[size];
+  for(int i = 0; i < size; i++) {
+    courses[i] = new int[size];
+  }
+  for(int i = 0; i < size; i++){
+    for(int j = 0; j < size; j++){
+      courses[i][j] = 0;
+    }
+  }
+  
+  colors = new int[size];
+  maxColor = 1;
+}
+
+Schedule::~Schedule()
+{
+  delete [] courses;
+  delete [] colors;
+}
+
+void Schedule::addEdge(int a, int b)
+{
+  courses[a][b] = 1;
+  courses[b][a] = 1;
+}
+
+void Schedule::display() const
+{
+  cout << "   ";
+  for(int i = 0; i < size; i++){
+    cout << i << " ";
+  }
+  cout << endl;
+  cout << "   ";
+  for(int i = 0; i < size; i++){
+    cout << "_" << " ";
+  }
+  cout << endl;
+  for(int i = 0; i < size; i++){
+    cout << i << "| ";
+    for(int j = 0; j < size; j++){
+      cout << courses[i][j] << " ";
+    }
+    cout << endl;
+  }
+}
+
+bool Schedule::isAdjacent(int a, int b)
+{
+  if(courses[a][b] == 1)
+    return true;
+  else
+    return false;
+}
+
+void Schedule::colorGraph()
+{
+  int num, min, newColor = 1;
+    
+  int* temp = new int[size];
+  for(int i = 0; i < size; i++){
+    colors[i] = -1;
+  }
+  colors[0] = 0;
+  for(int i = 0; i < size; i++){
+    temp[i] = colors[i];
+  }
+
+  for(int i = 0; i < size; i++){
+    for(int j = 0; j < size; j++){
+      if(isAdjacent(i, j)){
+        num = colors[j];
+        for(int k = 0; k < size; k++){
+          if(num == temp[k]){
+            temp[k] = -1;                 
+          }
+        }
+      }
+    }
+    min = size;
+    for(int l = 0; l < size; l++){
+      if(temp[l] >= 0 && temp[l] < min){
+        min = temp[l];
+      }
+    }
+    if(min == size){
+      colors[i] = newColor;
+      newColor++;
+    }
+    else{
+      colors[i] = min;
+    }
+    for(int m = 0; m < size; m++){
+      temp[m] = colors[m];
+    }
+  }
+  
+  delete [] temp;
+    
+  //test colorGraph
+  
+  for(int i = 0; i < size; i++){
+    if(colors[i] > maxColor)
+      maxColor = colors[i];
+  }
+  
+  cout << endl << "Testing colorGraph:" << endl;
+  cout << "Colors = [";
+  for(int i = 0; i < size; i++){
+    cout << " c" << colors[i];
+  }
+  cout << " ]" << endl;
+}
+
+void Schedule::printSchedule()
+{
+  int count = 0;
+  cout << endl << "Printing the exam schedule." << endl;
+  
+  while(count != maxColor + 1){
+    cout << "Slot " << count + 1 << ": ";
+    for(int i = 0; i < size; i++){
+      if(colors[i] == count)
+        cout << "course" << i << " ";
+    }
+    cout << endl;
+    count++;
+  }
+  cout << endl;
+}
+
+int Schedule::degree(int i) const
+{
+  int count = 0;
+  for(int j = 0; j < size; j++){
+    if(courses[i][j] == 1)
+      count++;
+  }
+  return count;
+}
